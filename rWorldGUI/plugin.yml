@@ -1,0 +1,16 @@
+﻿name: rWorldGUI
+version: 1.0.0
+main: org.whitehack97.rWorldGUI.main.rWorldGUI
+author: ReanKR
+description: the more better than World Teleporter.
+commands:
+  rWorldGUI.main:
+    description: §erWorldGUI Main command
+    aliases: [rw, rworld]
+permissions:
+  rworldgui.*:
+    description: Available rWorldGUI all commands.
+    default: OP
+  rworldgui.run:
+    description: no description.
+    default: true
