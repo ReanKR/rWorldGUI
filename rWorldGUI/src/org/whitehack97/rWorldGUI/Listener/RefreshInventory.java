@@ -15,11 +15,11 @@ public class RefreshInventory implements Runnable
 	@Override
 	public void run()
 	{
-		for(Inventory inventory : rWorldGUI.InventoryInfomation.keySet())
+		for(Inventory inventory : rWorldGUI.InventoryInformation.keySet())
 		{
-			for(Integer Index : rWorldGUI.InventoryInfomation.get(inventory).keySet())
+			for(Integer Index : rWorldGUI.InventoryInformation.get(inventory).keySet())
 			{
-				ExpandItem eItem = rWorldGUI.InventoryInfomation.get(inventory).get(Index);
+				ExpandItem eItem = rWorldGUI.InventoryInformation.get(inventory).get(Index);
 				ItemStack itemStack = eItem.getItemStack();
 				ItemMeta ItemMeta = itemStack.getItemMeta();
 				
@@ -28,29 +28,27 @@ public class RefreshInventory implements Runnable
 					if(ItemMeta.hasDisplayName())
 					{
 						ItemMeta.setDisplayName(SubManager.RepWorldAmounts(eItem.getLocation().getWorld(), ItemMeta.getDisplayName()));
-						if(ItemMeta.getDisplayName().contains("%world%"));
-						{
-							ItemMeta.setDisplayName(SubManager.RepWorldName(eItem.getLocation().getWorld(), ItemMeta.getDisplayName()));
-							
-						}
 					}
 					if(ItemMeta.hasLore())
 					{
 						List<String> repLore = new ArrayList<String>();
-						for(String Str : ItemMeta.getLore())
+						for(String Str : eItem.getLore())
 						{
 							repLore.add(SubManager.RepWorldAmounts(eItem.getLocation().getWorld(), Str));
 						}
 						ItemMeta.setLore(repLore);
 					}
 					itemStack.setItemMeta(ItemMeta);
-					if(eItem.getLocation().getWorld().getPlayers().size() != 0 || eItem.getLocation().getWorld().getPlayers().size() == 1)
+					if(eItem.getLocation().getWorld().getPlayers().size() >= 0 && eItem.getLocation().getWorld().getPlayers().size() <= 63)
 					{
-						itemStack.setAmount(1);
+						itemStack.setAmount(eItem.getLocation().getWorld().getPlayers().size());
 					}
 					else
 					{
-						itemStack.setAmount(eItem.getLocation().getWorld().getPlayers().size());
+						if(eItem.getLocation().getWorld().getPlayers().size() > 63)
+						{
+							itemStack.setAmount(64);
+						}
 					}
 					
 					itemStack.setItemMeta(ItemMeta);

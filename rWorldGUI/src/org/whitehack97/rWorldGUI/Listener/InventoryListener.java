@@ -21,7 +21,7 @@ public class InventoryListener implements Listener
 	{
 		Player player = (Player) event.getPlayer();
 		Inventory inventory = event.getInventory();
-		if(rWorldGUI.InventoryInfomation.containsKey(inventory))
+		if(rWorldGUI.InventoryInformation.containsKey(inventory))
 		{
 			ExpandInventory InventoryDetailed = rWorldGUI.InventoryUtil.get(inventory);
 			if(InventoryDetailed.isSoundEnabled())
@@ -29,6 +29,7 @@ public class InventoryListener implements Listener
 				player.playSound(player.getLocation(), Sound.NOTE_PLING, 1.0F, 1.0F);
 			}
 		}
+		
 	}
 	
 	@EventHandler
@@ -36,23 +37,45 @@ public class InventoryListener implements Listener
 	{
 		Player player = (Player)event.getWhoClicked();
 		Inventory inventory = event.getInventory();
-		if(rWorldGUI.InventoryInfomation.containsKey(inventory))
+		if(rWorldGUI.InventoryInformation.containsKey(inventory))
 		{
-			if(rWorldGUI.InventoryUtil.containsKey(event.getClickedInventory()))
+			try
 			{
-				if(!(event.getCurrentItem().getType() == Material.AIR) && rWorldGUI.InventoryInfomation.get(event.getClickedInventory()).containsKey(event.getSlot()))
+				if(!(event.getCurrentItem().getType() == Material.AIR) && rWorldGUI.InventoryInformation.get(inventory).containsKey(event.getSlot()))
 				{
-					ExpandItem expandItem = rWorldGUI.InventoryInfomation.get(event.getClickedInventory()).get(event.getSlot());
-					if(expandItem.getType().equalsIgnoreCase("CLOSE"))
+					if(event.isRightClick() || event.isLeftClick())
 					{
 						event.setCancelled(true);
+					}
+					ExpandItem expandItem = rWorldGUI.InventoryInformation.get(event.getClickedInventory()).get(event.getSlot());
+					if(expandItem.getType().equalsIgnoreCase("CLOSE"))
+					{
 						player.closeInventory();
+						return;
+					}
+					else if(expandItem.getType().equalsIgnoreCase("COMMAND"))
+					{
+						String command = expandItem.getCommand();
+						player.closeInventory();
+						if(command.contains("Console"))
+						{
+							String[] CommandType = command.split(": ");
+							String FinCommand = CommandType[1].replaceAll("%player%", player.getName()).toLowerCase();
+							rWorldGUI.plugin.getServer().dispatchCommand(rWorldGUI.plugin.getServer().getConsoleSender(), FinCommand);
+						}
+						else
+						{
+							player.chat("/" + command.toLowerCase());
+						}
 						return;
 					}
 					else if(expandItem.getType().equalsIgnoreCase("WORLD_INFORMATION"))
 					{
-						event.setCancelled(true);
 						player.teleport(expandItem.getLocation());
+						return;
+					}
+					else
+					{
 						return;
 					}
 				}
@@ -62,7 +85,7 @@ public class InventoryListener implements Listener
 					return;
 				}
 			}
-			else
+			catch(NullPointerException e)
 			{
 				return;
 			}

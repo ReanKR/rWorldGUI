@@ -2,6 +2,7 @@
 version: 1.0.0
 main: org.whitehack97.rWorldGUI.main.rWorldGUI
 author: ReanKR
+depend: [GuildWorldManager]
 description: the more better than World Teleporter.
 commands:
   rWorldGUI.main:

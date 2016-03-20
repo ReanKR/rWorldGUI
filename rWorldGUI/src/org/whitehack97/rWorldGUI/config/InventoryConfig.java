@@ -42,7 +42,7 @@ public class InventoryConfig
 						if(FileSection.contains("InventoryRows")) size = FileSection.getInt("InventoryRows") * 9;
 						if(FileSection.contains("OpenCommand")) OpenCommand = FileSection.getString("OpenCommand");
 						if(FileSection.contains("SoundEnabled")) SoundEnabled = FileSection.getBoolean("SoundEnabled");
-						Inventory NewInventory = Bukkit.createInventory(null, size, FileSection.getString("InventoryName"));
+						Inventory NewInventory = Bukkit.createInventory(null, size, SubManager.RepColor(FileSection.getString("InventoryName")));
 						ExpandInventory InventoryInfo = new ExpandInventory(NewInventory, file.getAbsolutePath());
 						InventoryInfo.setOpenCommand(OpenCommand);
 						InventoryInfo.setEnableSound(SoundEnabled);
@@ -63,8 +63,13 @@ public class InventoryConfig
 								List<String> Lore = new ArrayList<String>();
 								String Type = "WORLD_INFORMATION";
 								if(FileSection.contains(index + ".NAME")) Name = SubManager.RepColor(FileSection.getString(index + ".NAME"));
-								if(FileSection.contains(index + ".LORE")) Lore = SubManager.RepColorList(FileSection.getStringList(index + ".LORE"));
+								if(FileSection.contains(index + ".LORE"))
+								{
+									Lore = SubManager.RepColorList(FileSection.getStringList(index + ".LORE"));
+									Item.setLore(FileSection.getStringList(index + ".LORE"));
+								}
 								if(FileSection.contains(index + ".ETC")) Type = FileSection.getString(index + ".ETC");
+								else Type = "NONE";
 								if(FileSection.contains(index + ".POSITION-X") && FileSection.contains(index + ".POSITION-Y"))
 								{
 									px = FileSection.getInt(index + ".POSITION-X");
@@ -72,6 +77,7 @@ public class InventoryConfig
 								}
 								if(px == 0 || py == 0)
 								{
+									Bukkit.getConsoleSender().sendMessage("Return c");
 									// Missing Position
 									continue;
 								}
@@ -80,10 +86,18 @@ public class InventoryConfig
 									itemMeta.setLore(Lore);
 									itemMeta.setDisplayName(Name);
 									itemStack.setItemMeta(itemMeta);
-									
-									if(Type.equalsIgnoreCase("CLOSE") || !Type.equalsIgnoreCase("WORLD_INFORMATION"))
+									if(Type.equalsIgnoreCase("COMMAND"))
+									{
+										Item.setComamnd(FileSection.getString(index + ".COMMAND").toLowerCase());
+										Item.setType("COMMAND");
+									}
+									else if(Type.equalsIgnoreCase("CLOSE"))
 									{
 										Item.setType("CLOSE");
+									}
+									else if(Type.equalsIgnoreCase("NONE"))
+									{
+										Item.setType("NONE");
 									}
 									else if(Type.equalsIgnoreCase("WORLD_INFORMATION"))
 									{
@@ -101,6 +115,7 @@ public class InventoryConfig
 												}
 												catch(NullPointerException e)
 												{
+													e.printStackTrace();
 													// world does not exist on server.
 													continue;
 												}
@@ -160,7 +175,7 @@ public class InventoryConfig
 												// YAW missing
 												continue;
 											}
-											Location location = new Location(world, x, y, z, Pitch, Yaw);
+											Location location = new Location(world, x, y, z, Yaw, Pitch);
 											Item.setLocation(location);
 										}
 										else
@@ -180,10 +195,10 @@ public class InventoryConfig
 								continue;
 							}
 						}
-						rWorldGUI.InventoryInfomation.put(NewInventory, Items);
+						rWorldGUI.InventoryInformation.put(NewInventory, Items);
 						rWorldGUI.InventoryUtil.put(NewInventory, InventoryInfo);
-						rWorldGUI.InventoryCommand.put(OpenCommand, NewInventory);
-						rWorldGUI.InventoryYaml.put("1", NewInventory);
+						rWorldGUI.InventoryCommand.put("/" + InventoryInfo.getOpenCommand().toLowerCase(), NewInventory);
+						rWorldGUI.InventoryYaml.put(file.getName().replaceAll(".yml", "").toLowerCase(), NewInventory);
 					}
 					else
 					{
@@ -191,6 +206,14 @@ public class InventoryConfig
 						continue;
 					}
 				}
+				else
+				{
+					continue;
+				}
+			}
+			else
+			{
+				continue;
 			}
 		}
 	}

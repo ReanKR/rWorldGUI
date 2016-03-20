@@ -11,11 +11,14 @@ public class PlayerListener implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void PlayerCommand(PlayerCommandPreprocessEvent event)
 	{
-		if(rWorldGUI.InventoryCommand.containsKey(event.getMessage()))
+		if(rWorldGUI.InventoryCommand.containsKey(event.getMessage().toLowerCase()))
 		{
 			event.setCancelled(true);
-			event.getPlayer().openInventory(rWorldGUI.InventoryCommand.get(event.getMessage()));
+			event.getPlayer().openInventory(rWorldGUI.InventoryCommand.get(event.getMessage().toLowerCase()));
 		}
-		return;
+		else
+		{
+			return;
+		}
 	}
 }
